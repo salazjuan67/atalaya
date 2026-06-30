@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Camera, CheckCircle2, CheckSquare, Upload, X } from 'lucide-react'
+import { Building2, Camera, CheckCircle2, CheckSquare, Upload, X } from 'lucide-react'
+import { IconBox } from '../components/ui/IconBox'
 import { getEmpresas, type VisitaItemEstado } from '../data/mock'
 
 const CHECKLIST_ITEMS = [
@@ -58,13 +59,13 @@ function ItemEstadoSelector({
   ]
 
   return (
-    <div className="flex shrink-0 gap-1.5">
+    <div className="grid w-full grid-cols-3 gap-1.5 sm:flex sm:w-auto sm:shrink-0 sm:gap-1.5">
       {options.map(({ estado, label, active, idle }) => (
         <button
           key={estado}
           type="button"
           onClick={() => onChange(estado)}
-          className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
+          className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors sm:px-2.5 sm:py-1 ${
             value === estado ? active : idle
           }`}
         >
@@ -102,7 +103,7 @@ function ChecklistForm({
 
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   return (
-    <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-xl border border-border bg-card px-5 py-3.5 shadow-sm">
+    <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-border bg-card px-5 py-3.5 shadow-lg">
       <CheckCircle2 className="h-4 w-4 shrink-0 text-status-done" strokeWidth={2} />
       <p className="text-sm font-medium text-gray-900">{message}</p>
       <button
@@ -165,15 +166,18 @@ export function CargarVisita() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Selector de empresa */}
-      <div className="rounded-xl border border-border bg-card p-6">
-        <label htmlFor="empresa" className="block text-sm font-medium text-gray-700">
-          Empresa
-        </label>
+      <div className="card-base p-6">
+        <div className="mb-3 flex items-center gap-3">
+          <IconBox icon={Building2} variant="neutral" size="sm" />
+          <label htmlFor="empresa" className="text-sm font-semibold text-gray-800">
+            Empresa
+          </label>
+        </div>
         <select
           id="empresa"
           value={empresaId}
           onChange={(e) => setEmpresaId(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          className="w-full rounded-xl border border-border bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
         >
           {empresas.map((e) => (
             <option key={e.id} value={e.id}>
@@ -184,26 +188,26 @@ export function CargarVisita() {
       </div>
 
       {/* Pestañas de carga */}
-      <div className="rounded-xl border border-border bg-card">
-        <div className="flex border-b border-border">
-          {tabs.map(({ id, label, icon: Icon }) => (
+      <div className="card-base overflow-hidden">
+        <div className="flex flex-col gap-1.5 p-1.5 sm:flex-row">
+          {tabs.map(({ id, label, icon }) => (
             <button
               key={id}
               type="button"
               onClick={() => setTab(id)}
-              className={`flex flex-1 items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium transition-colors ${
+              className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-medium transition-all sm:px-4 ${
                 tab === id
-                  ? 'border-b-2 border-accent text-accent'
+                  ? 'bg-card text-accent shadow-sm'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              <Icon className="h-4 w-4" strokeWidth={1.75} />
-              {label}
+              <IconBox icon={icon} variant={tab === id ? 'accent' : 'neutral'} size="sm" />
+              <span className="truncate">{id === 'foto' ? 'Foto de la hoja' : label}</span>
             </button>
           ))}
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {tab === 'checklist' && (
             <div>
               <p className="mb-5 text-sm text-gray-500">
@@ -224,13 +228,13 @@ export function CargarVisita() {
                   }}
                   onDragLeave={() => setDragOver(false)}
                   onDrop={handleDrop}
-                  className={`flex flex-col items-center rounded-xl border-2 border-dashed px-6 py-12 transition-colors ${
+                  className={`flex flex-col items-center rounded-2xl border-2 border-dashed px-6 py-14 transition-all ${
                     dragOver
-                      ? 'border-accent bg-accent/5'
-                      : 'border-border bg-surface'
+                      ? 'border-accent bg-accent-soft'
+                      : 'border-border bg-surface-muted/50'
                   }`}
                 >
-                  <Upload className="h-8 w-8 text-gray-400" strokeWidth={1.5} />
+                  <IconBox icon={Upload} variant="accent" size="lg" />
                   <p className="mt-4 text-sm font-medium text-gray-700">
                     Arrastrá una foto acá o seleccioná un archivo
                   </p>
@@ -240,7 +244,7 @@ export function CargarVisita() {
                   <button
                     type="button"
                     onClick={() => simularCarga()}
-                    className="mt-6 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                    className="mt-6 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-surface-muted"
                   >
                     Seleccionar foto
                   </button>
@@ -277,8 +281,8 @@ export function CargarVisita() {
       </div>
 
       {/* Observaciones — siempre visible */}
-      <div className="rounded-xl border border-border bg-card p-6">
-        <label htmlFor="observaciones" className="block text-sm font-medium text-gray-700">
+      <div className="card-base p-6">
+        <label htmlFor="observaciones" className="block text-sm font-semibold text-gray-800">
           Observaciones
         </label>
         <p className="mt-1 text-xs text-gray-500">
@@ -290,17 +294,16 @@ export function CargarVisita() {
           onChange={(e) => setObservaciones(e.target.value)}
           rows={4}
           placeholder="Notas de la visita, acuerdos, pendientes…"
-          className="mt-3 w-full resize-none rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          className="mt-3 w-full resize-none rounded-xl border border-border bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
         />
       </div>
 
-      {/* Guardar */}
       <div className="flex justify-end pb-4">
         <button
           type="button"
           onClick={handleGuardar}
           disabled={!empresaId}
-          className="rounded-lg bg-accent px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-xl bg-accent px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Guardar visita
         </button>

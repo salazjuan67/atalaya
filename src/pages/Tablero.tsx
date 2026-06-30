@@ -2,8 +2,12 @@ import { Link } from 'react-router-dom'
 import {
   AlertTriangle,
   ArrowRight,
+  BarChart3,
   Building2,
   ClipboardList,
+  LineChart,
+  PieChart,
+  Radar,
   ShieldAlert,
   UserPlus,
   Users,
@@ -14,15 +18,17 @@ import {
   CartesianGrid,
   Cell,
   Line,
-  LineChart,
+  LineChart as RechartsLine,
   Pie,
-  PieChart,
+  PieChart as RechartsPie,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts'
 import { Badge } from '../components/ui/Badge'
+import { IconBox } from '../components/ui/IconBox'
+import { StatCard } from '../components/ui/StatCard'
 import {
   evolucionAfiliados,
   getEmpresasAtencion,
@@ -33,32 +39,21 @@ import {
 
 const CHART_COLORS = ['#2563eb', '#dc2626', '#d97706', '#16a34a', '#6b7280', '#9333ea']
 
-function StatCard({
-  label,
-  value,
-  icon: Icon,
-  valueClassName = 'text-gray-900',
+function ChartCard({
+  title,
+  icon,
+  children,
 }: {
-  label: string
-  value: number
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
-  valueClassName?: string
+  title: string
+  icon: typeof BarChart3
+  children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-sm text-gray-500">{label}</p>
-        <Icon className="h-4 w-4 shrink-0 text-gray-400" strokeWidth={1.75} />
+    <div className="card-base p-4 sm:p-6">
+      <div className="mb-5 flex items-center gap-3">
+        <IconBox icon={icon} variant="accent" size="sm" />
+        <h2 className="text-base font-semibold tracking-tight text-gray-800">{title}</h2>
       </div>
-      <p className={`mt-2 text-3xl font-semibold tabular-nums ${valueClassName}`}>{value}</p>
-    </div>
-  )
-}
-
-function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-6">
-      <h2 className="mb-5 text-sm font-medium text-gray-700">{title}</h2>
       {children}
     </div>
   )
@@ -66,10 +61,10 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
 
 const tooltipStyle = {
   contentStyle: {
-    borderRadius: '0.5rem',
-    border: '1px solid #e5e7eb',
+    borderRadius: '0.75rem',
+    border: '1px solid #e2e8f0',
     fontSize: '0.75rem',
-    boxShadow: 'none',
+    boxShadow: '0 1px 3px rgb(0 0 0 / 0.04)',
   },
 }
 
@@ -81,23 +76,24 @@ export function Tablero() {
 
   return (
     <div className="space-y-6">
-      {/* KPIs */}
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-3 2xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-3 2xl:grid-cols-6 sm:gap-4">
         <StatCard label="Total de empresas" value={kpis.totalEmpresas} icon={Building2} />
         <StatCard label="Visitas del mes" value={kpis.visitasDelMes} icon={ClipboardList} />
         <StatCard
           label="Problemas abiertos"
           value={kpis.problemasAbiertos}
           icon={AlertTriangle}
+          iconVariant="open"
           valueClassName="text-status-open"
         />
         <StatCard
           label="Casos ART abiertos"
           value={kpis.casosArtAbiertos}
           icon={ShieldAlert}
+          iconVariant="prog"
           valueClassName="text-status-prog"
         />
-        <StatCard label="Afiliados totales" value={kpis.afiliadosTotales} icon={Users} />
+        <StatCard label="Afiliados totales" value={kpis.afiliadosTotales} icon={Users} iconVariant="done" />
         <StatCard
           label="Afiliaciones nuevas del mes"
           value={kpis.afiliacionesNuevasMes}
@@ -105,33 +101,22 @@ export function Tablero() {
         />
       </div>
 
-      {/* Gráficos */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <ChartCard title="Visitas por mes">
+        <ChartCard title="Visitas por mes" icon={BarChart3}>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={visitasPorMes} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-              <XAxis
-                dataKey="mes"
-                tick={{ fontSize: 12, fill: '#6b7280' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 12, fill: '#6b7280' }}
-                axisLine={false}
-                tickLine={false}
-                allowDecimals={false}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="#eef1f5" vertical={false} />
+              <XAxis dataKey="mes" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip {...tooltipStyle} />
-              <Bar dataKey="visitas" fill="#2563eb" radius={[4, 4, 0, 0]} maxBarSize={40} />
+              <Bar dataKey="visitas" fill="#2563eb" radius={[6, 6, 0, 0]} maxBarSize={40} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Problemas por tipo">
+        <ChartCard title="Problemas por tipo" icon={PieChart}>
           <ResponsiveContainer width="100%" height={240}>
-            <PieChart>
+            <RechartsPie>
               <Pie
                 data={problemasPorTipo}
                 dataKey="cantidad"
@@ -147,7 +132,7 @@ export function Tablero() {
                 ))}
               </Pie>
               <Tooltip {...tooltipStyle} />
-            </PieChart>
+            </RechartsPie>
           </ResponsiveContainer>
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
             {problemasPorTipo.map((item, i) => (
@@ -162,21 +147,13 @@ export function Tablero() {
           </div>
         </ChartCard>
 
-        <ChartCard title="Evolución de afiliados">
+        <ChartCard title="Evolución de afiliados" icon={LineChart}>
           <ResponsiveContainer width="100%" height={240}>
-            <LineChart
-              data={evolucionAfiliados}
-              margin={{ top: 4, right: 4, left: -10, bottom: 0 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-              <XAxis
-                dataKey="mes"
-                tick={{ fontSize: 12, fill: '#6b7280' }}
-                axisLine={false}
-                tickLine={false}
-              />
+            <RechartsLine data={evolucionAfiliados} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#eef1f5" vertical={false} />
+              <XAxis dataKey="mes" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} />
               <YAxis
-                tick={{ fontSize: 12, fill: '#6b7280' }}
+                tick={{ fontSize: 12, fill: '#64748b' }}
                 axisLine={false}
                 tickLine={false}
                 domain={['dataMin - 20', 'dataMax + 10']}
@@ -190,27 +167,33 @@ export function Tablero() {
                 dot={{ fill: '#2563eb', r: 3 }}
                 activeDot={{ r: 5 }}
               />
-            </LineChart>
+            </RechartsLine>
           </ResponsiveContainer>
         </ChartCard>
       </div>
 
-      {/* Empresas que requieren atención */}
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="text-sm font-medium text-gray-700">Empresas que requieren atención</h2>
-        <p className="mt-1 text-xs text-gray-500">
-          Priorizadas por problemas abiertos, casos ART y antigüedad de la última visita.
-        </p>
+      <div className="card-base p-4 sm:p-6">
+        <div className="mb-5 flex items-center gap-3">
+          <IconBox icon={Radar} variant="open" size="sm" />
+          <div>
+            <h2 className="text-base font-semibold tracking-tight text-gray-800">
+              Empresas que requieren atención
+            </h2>
+            <p className="mt-0.5 text-xs text-gray-500">
+              Priorizadas por problemas abiertos, casos ART y antigüedad de la última visita.
+            </p>
+          </div>
+        </div>
 
-        <ul className="mt-5 divide-y divide-border">
+        <ul className="divide-y divide-border">
           {empresasAtencion.map(({ empresa, motivos }) => (
             <li key={empresa.id}>
               <Link
                 to={`/empresas/${empresa.id}`}
-                className="group flex items-center justify-between gap-4 py-4 transition-colors hover:bg-gray-50 -mx-2 px-2 rounded-lg"
+                className="group -mx-2 flex items-center justify-between gap-4 rounded-xl px-2 py-4 transition-all hover:bg-surface-muted"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-900 group-hover:text-accent">
+                  <p className="text-sm font-semibold text-gray-900 group-hover:text-accent">
                     {empresa.razonSocial}
                   </p>
                   <p className="mt-0.5 text-xs text-gray-500">

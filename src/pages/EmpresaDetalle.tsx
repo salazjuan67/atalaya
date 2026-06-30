@@ -1,13 +1,23 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import type { LucideIcon } from 'lucide-react'
 import {
+  AlertTriangle,
+  BarChart3,
+  Binoculars,
+  CalendarDays,
   Camera,
   CheckSquare,
   ClipboardPlus,
+  History,
   Lock,
+  ShieldAlert,
+  Users,
   X,
 } from 'lucide-react'
 import { Badge } from '../components/ui/Badge'
+import { IconBox, type IconBoxVariant } from '../components/ui/IconBox'
+import { StatCard } from '../components/ui/StatCard'
 import {
   getCasosArtByEmpresa,
   getEmpresa,
@@ -33,38 +43,28 @@ function problemaEstadoBadge(estado: ProblemaEstado) {
   return <Badge variant={variant}>{label}</Badge>
 }
 
-function StatCard({
-  label,
-  value,
-  valueClassName = 'text-gray-900',
-}: {
-  label: string
-  value: string | number
-  valueClassName?: string
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-5">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className={`mt-1 text-3xl font-semibold tabular-nums ${valueClassName}`}>{value}</p>
-    </div>
-  )
-}
-
 function SectionCard({
   title,
+  icon,
+  iconVariant = 'neutral',
   actionLabel,
   onAction,
   children,
 }: {
   title: string
+  icon: LucideIcon
+  iconVariant?: IconBoxVariant
   actionLabel?: string
   onAction?: () => void
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-6">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="text-sm font-medium text-gray-700">{title}</h2>
+    <div className="card-base p-4 sm:p-6">
+      <div className="mb-4 flex flex-col gap-3 sm:mb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <IconBox icon={icon} variant={iconVariant} size="sm" />
+          <h2 className="text-base font-semibold tracking-tight text-gray-800">{title}</h2>
+        </div>
         {actionLabel && onAction && (
           <button
             type="button"
@@ -157,8 +157,8 @@ function VisitaRow({ visita }: { visita: Visita }) {
 
 function PlaceholderModal({ title, onClose }: { title: string; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
-      <div className="w-full max-w-md rounded-xl border border-border bg-card p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 p-4 backdrop-blur-[2px]">
+      <div className="card-base w-full max-w-md p-6">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-medium text-gray-900">{title}</h3>
           <button
@@ -196,7 +196,7 @@ export function EmpresaDetalle() {
 
   if (!empresa) {
     return (
-      <div className="rounded-xl border border-border bg-card p-8 text-center">
+      <div className="card-base p-8 text-center">
         <p className="text-sm text-gray-500">No se encontró la empresa.</p>
         <Link to="/empresas" className="mt-4 inline-block text-sm font-medium text-accent">
           Volver al listado
@@ -215,21 +215,28 @@ export function EmpresaDetalle() {
   return (
     <div className="space-y-6">
       {/* Cabecera */}
-      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-semibold text-gray-900">{empresa.razonSocial}</h1>
-          <p className="mt-2 text-sm text-gray-500">
-            {empresa.cuit} · {empresa.rubro} · Delegación central · {empresa.telefono} ·{' '}
-            {empresa.direccion}
-          </p>
+      <div className="card-base flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-6">
+        <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
+          <IconBox icon={Binoculars} variant="accent" size="md" className="hidden sm:flex" />
+          <div className="min-w-0">
+            <h1 className="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">
+              {empresa.razonSocial}
+            </h1>
+            <p className="mt-2 text-xs leading-relaxed text-gray-500 sm:text-sm">
+              <span className="block sm:inline">{empresa.cuit} · {empresa.rubro}</span>
+              <span className="hidden sm:inline"> · Delegación central · </span>
+              <span className="block sm:inline">{empresa.telefono}</span>
+              <span className="block sm:inline sm:before:content-['·_']">{empresa.direccion}</span>
+            </p>
+          </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
+        <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:items-end">
           <Badge variant="prog">Última visita {formatHaceDias(diasVisita)}</Badge>
           <button
             type="button"
             onClick={() => navigate(`/cargar-visita?empresa=${empresa.id}`)}
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent/90"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-accent/90 sm:w-auto sm:py-2.5"
           >
             <ClipboardPlus className="h-4 w-4" strokeWidth={2} />
             Cargar visita
@@ -237,26 +244,31 @@ export function EmpresaDetalle() {
         </div>
       </div>
 
-      {/* Indicadores */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Última visita (días)" value={diasVisita} valueClassName="text-gray-900" />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <StatCard label="Última visita (días)" value={diasVisita} icon={CalendarDays} />
         <StatCard
           label="Problemas abiertos"
           value={empresa.problemasAbiertos}
+          icon={AlertTriangle}
+          iconVariant="open"
           valueClassName="text-status-open"
         />
         <StatCard
           label="Casos ART abiertos"
           value={empresa.casosArtAbiertos}
+          icon={ShieldAlert}
+          iconVariant="prog"
           valueClassName="text-status-prog"
         />
-        <StatCard label="Afiliados" value={empresa.afiliados} />
+        <StatCard label="Afiliados" value={empresa.afiliados} icon={Users} iconVariant="done" />
       </div>
 
       {/* Grilla 2 columnas */}
       <div className="grid gap-6 lg:grid-cols-2">
         <SectionCard
           title="Problemas abiertos"
+          icon={AlertTriangle}
+          iconVariant="open"
           actionLabel="Ver todos"
           onAction={() => setModal('Problemas abiertos')}
         >
@@ -269,6 +281,8 @@ export function EmpresaDetalle() {
 
         <SectionCard
           title="Casos ART"
+          icon={ShieldAlert}
+          iconVariant="prog"
           actionLabel="Ver seguimiento"
           onAction={() => setModal('Seguimiento de casos ART')}
         >
@@ -279,7 +293,7 @@ export function EmpresaDetalle() {
           )}
         </SectionCard>
 
-        <SectionCard title="Trámites de ministerio">
+        <SectionCard title="Trámites de ministerio" icon={Lock} iconVariant="neutral">
           <p className="mb-4 flex items-center gap-1.5 text-xs text-gray-400">
             <Lock className="h-3 w-3" strokeWidth={2} />
             Uso interno — no visible para la empresa
@@ -291,7 +305,7 @@ export function EmpresaDetalle() {
           )}
         </SectionCard>
 
-        <SectionCard title="Indicadores del mes">
+        <SectionCard title="Indicadores del mes" icon={BarChart3} iconVariant="accent">
           {indicadores ? (
             <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
               <div>
@@ -332,8 +346,11 @@ export function EmpresaDetalle() {
       </div>
 
       {/* Historial de visitas */}
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="mb-4 text-sm font-medium text-gray-700">Historial de visitas</h2>
+      <div className="card-base p-6">
+        <div className="mb-5 flex items-center gap-3">
+          <IconBox icon={History} variant="accent" size="sm" />
+          <h2 className="text-base font-semibold tracking-tight text-gray-800">Historial de visitas</h2>
+        </div>
         {visitas.length > 0 ? (
           visitas.map((v) => <VisitaRow key={v.id} visita={v} />)
         ) : (

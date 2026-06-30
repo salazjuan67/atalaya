@@ -21,10 +21,14 @@ export function AtalayaMark({ size = 32 }: { size?: number }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <rect width="32" height="32" rx="8" fill="#2563eb" />
-      {/* Horizonte */}
+      <defs>
+        <linearGradient id="atalayaGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#3b82f6" />
+          <stop offset="1" stopColor="#1d4ed8" />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="9" fill="url(#atalayaGrad)" />
       <path d="M7 23h18" stroke="white" strokeOpacity="0.35" strokeWidth="1.5" strokeLinecap="round" />
-      {/* Torre / atalaya */}
       <path
         d="M16 7.5v2M13.5 21V11.5L16 9l2.5 2.5V21"
         stroke="white"
@@ -32,21 +36,8 @@ export function AtalayaMark({ size = 32 }: { size?: number }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Plataforma de vigilancia */}
-      <path
-        d="M11 13.5h10"
-        stroke="white"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-      {/* Base */}
-      <path
-        d="M9.5 21h13"
-        stroke="white"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-      {/* Faro / punto de observación */}
+      <path d="M11 13.5h10" stroke="white" strokeWidth="1.75" strokeLinecap="round" />
+      <path d="M9.5 21h13" stroke="white" strokeWidth="1.75" strokeLinecap="round" />
       <circle cx="16" cy="7.5" r="1.75" fill="white" />
     </svg>
   )

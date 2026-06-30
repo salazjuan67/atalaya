@@ -1,19 +1,27 @@
 import type { LucideIcon } from 'lucide-react'
+import { IconBox, type IconBoxVariant } from './IconBox'
 
 interface CardProps {
   title?: string
   icon?: LucideIcon
+  iconVariant?: IconBoxVariant
   children: React.ReactNode
   className?: string
 }
 
-export function Card({ title, icon: Icon, children, className = '' }: CardProps) {
+export function Card({
+  title,
+  icon,
+  iconVariant = 'neutral',
+  children,
+  className = '',
+}: CardProps) {
   return (
-    <div className={`rounded-xl border border-border bg-card p-6 ${className}`}>
+    <div className={`card-base p-6 ${className}`}>
       {title && (
-        <div className="mb-4 flex items-center gap-2">
-          {Icon && <Icon className="h-4 w-4 text-gray-500" strokeWidth={1.75} />}
-          <h2 className="text-sm font-medium text-gray-700">{title}</h2>
+        <div className="mb-5 flex items-center gap-3">
+          {icon && <IconBox icon={icon} variant={iconVariant} size="sm" />}
+          <h2 className="text-base font-semibold tracking-tight text-gray-800">{title}</h2>
         </div>
       )}
       {children}
