@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #f8f9fb;
+  --color-card: #ffffff;
+  --color-border: #e5e7eb;
+  --color-accent: #2563eb;
+  --color-status-open: #dc2626;
+  --color-status-prog: #d97706;
+  --color-status-done: #16a34a;
+  --color-status-neutral: #6b7280;
+  --font-sans: Inter, system-ui, sans-serif;
+}
+
+body {
+  @apply bg-surface text-gray-900 font-sans antialiased;
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+}
